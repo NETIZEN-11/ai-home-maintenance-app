@@ -51,3 +51,6 @@ coverage/
 .cache/
 temp/
 tmp/
+
+# Viva Explanation (Personal Notes - Do Not Push)
+viva-explanation/
