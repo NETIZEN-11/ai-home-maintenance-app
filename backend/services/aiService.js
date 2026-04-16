@@ -18,7 +18,7 @@ const analyzeIssue = async (text, imageUrl) => {
   
   // Check if API key is configured properly
   if (!apiKey || apiKey.includes('your-') || apiKey.includes('Demo') || apiKey.length < 20) {
-    console.warn("⚠️  Gemini API key not configured, using mock response");
+    console.warn("WARNING: Gemini API key not configured, using mock response");
     return getMockResponse(text);
   }
 

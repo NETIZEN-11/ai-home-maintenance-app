@@ -52,6 +52,40 @@ An intelligent mobile application that leverages AI to help homeowners maintain 
 - **AsyncStorage** - Local data persistence
 - **Expo Camera** - Camera integration for image capture
 
+## 🚀 Deployment
+
+### Deploy Backend to Render
+
+1. **Create MongoDB Atlas Cluster** (free tier available):
+   - Go to [MongoDB Atlas](https://www.mongodb.com/atlas)
+   - Create a free cluster
+   - Get your connection string
+
+2. **Deploy on Render**:
+   - Go to [render.com](https://render.com) and sign up
+   - Click "New +" → "Web Service"
+   - Connect your GitHub repository
+   - Select the `backend` folder as root
+   - Set environment variables:
+     - `MONGO_URI` - Your MongoDB Atlas connection string
+     - `JWT_SECRET` - At least 32 characters
+     - `GEMINI_API_KEY` - (Optional) For AI features
+     - `NODE_ENV` = `production`
+   - Click "Deploy"
+
+3. **Environment Variables on Render**:
+   ```
+   MONGO_URI=mongodb+srv://username:password@cluster.xxxxx.mongodb.net/ai-hma
+   JWT_SECRET=your-super-secret-key-at-least-32-characters-long
+   NODE_ENV=production
+   ```
+
+### Important Notes
+
+- **Uploads are ephemeral**: On Render's free tier, files uploaded to the server are deleted on each deploy. For production, consider using Cloudinary or AWS S3 for file storage.
+- **Health Check**: Backend has `/health` endpoint at root path.
+- **CORS**: Render domain is already configured in CORS settings.
+
 ## 📁 Project Structure
 
 ```

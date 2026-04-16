@@ -19,30 +19,33 @@ const app = express();
 
 // Environment validation
 if (!process.env.MONGO_URI || !process.env.JWT_SECRET) {
-  console.error('❌ Missing required environment variables: MONGO_URI, JWT_SECRET');
+  console.error(' Missing required environment variables: MONGO_URI, JWT_SECRET');
   process.exit(1);
 }
 
 if (process.env.JWT_SECRET.length < 32) {
-  console.error('❌ JWT_SECRET must be at least 32 characters');
+  console.error(' JWT_SECRET must be at least 32 characters');
   process.exit(1);
 }
 
 // Warn about Gemini API key but don't exit
 if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.includes('your-') || process.env.GEMINI_API_KEY.includes('Demo')) {
-  console.warn('⚠️  Gemini API key not configured - AI features will use mock responses');
-  console.warn('📝 Get your API key from: https://makersuite.google.com/app/apikey');
+  console.warn('WARNING: Gemini API key not configured - AI features will use mock responses');
+  console.warn('Get your API key from: https://makersuite.google.com/app/apikey');
 }
 
 // CORS configuration - allow all origins in development
 const allowedOrigins = [
   'http://localhost:3000',
-  'http://localhost:5000', 
+  'http://localhost:5000',
   'http://localhost:8081',
   'http://10.0.2.2:5000', // Android emulator
   'http://127.0.0.1:8081',
   /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:\d+$/, // Local network IPs
   /^http:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+$/, // Private network IPs
+  // Render deployment domains
+  /^https:\/\/.*\.onrender\.com$/,
+  /\.render\.com$/,
 ];
 
 app.use(cors({
@@ -60,7 +63,7 @@ app.use(cors({
     if (isAllowed || process.env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
-      console.warn('⚠️  CORS blocked origin:', origin);
+      console.warn('CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -111,7 +114,7 @@ app.use((req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.message);
+  console.error('ERROR:', err.message);
   
   if (err.name === 'ValidationError') {
     return sendError(res, 400, 'Validation error', err.message);
@@ -138,14 +141,14 @@ const connectDB = async (attempt = 1) => {
       minPoolSize: 2,
       retryWrites: true
     });
-    console.log('✓ MongoDB connected');
+    console.log('MongoDB connected');
   } catch (error) {
     if (attempt < 5) {
       const delay = Math.pow(2, attempt) * 1000;
-      console.log(`⏳ Retrying connection in ${delay}ms (attempt ${attempt}/5)...`);
+      console.log(`Retrying connection in ${delay}ms (attempt ${attempt}/5)...`);
       setTimeout(() => connectDB(attempt + 1), delay);
     } else {
-      console.error('❌ MongoDB connection failed after 5 attempts');
+      console.error('MongoDB connection failed after 5 attempts');
       process.exit(1);
     }
   }
@@ -156,20 +159,20 @@ const PORT = process.env.PORT || 5000;
 
 connectDB().then(() => {
   app.listen(PORT, () => {
-    console.log(`✓ Server running on port ${PORT}`);
-    console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   });
 });
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
-  console.log('⏹ SIGTERM received, shutting down gracefully...');
+  console.log('SIGTERM received, shutting down gracefully...');
   await mongoose.connection.close();
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
-  console.log('⏹ SIGINT received, shutting down gracefully...');
+  console.log('SIGINT received, shutting down gracefully...');
   await mongoose.connection.close();
   process.exit(0);
 });
