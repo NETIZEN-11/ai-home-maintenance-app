@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   ActivityIndicator, RefreshControl, Alert, Image
@@ -39,7 +39,6 @@ export default function HomeScreen({ navigation }) {
   const [appliances, setAppliances] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [tokenSynced, setTokenSynced] = useState(false);
   const [needsSync, setNeedsSync] = useState(false);
 
   // Show user's email or UID instead of "there"
@@ -48,58 +47,72 @@ export default function HomeScreen({ navigation }) {
   // Auto-sync backend token if missing
   useEffect(() => {
     const syncBackendToken = async () => {
-      if (!user || tokenSynced) return;
-      
-      // Check if we have a token
+      // Give time for auth context to fully load
+      if (!user) return;
+
+      // Small delay to ensure token state is synced from AuthContext
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Re-check user and token after delay
+      if (!user) return;
+
+      // Check if we have a token in AuthContext
       if (!token) {
-        console.log("No backend token found - user may need to sync account");
+        console.log("No backend token - showing sync banner");
         setNeedsSync(true);
-        setTokenSynced(true);
         return;
       }
-      
-      // Test if token works silently (don't show alert on home screen)
+
+      // Test if token works
       try {
         await api.get("/api/appliances");
         console.log("Backend token is valid");
         setNeedsSync(false);
-        setTokenSynced(true);
       } catch (err) {
-        if (err.message?.includes('Not authorized')) {
-          console.log("Backend token invalid - user needs to sync account");
-          setNeedsSync(true);
-        }
-        setTokenSynced(true);
+        console.log("Backend token invalid:", err.message);
+        setNeedsSync(true);
       }
     };
-    
+
     syncBackendToken();
-  }, [user, token, tokenSynced]);
+  }, [user]);
 
   const handleSyncAccount = async () => {
-    // For Android, we need a custom input dialog
-    // For now, navigate to a sync screen or use a simpler approach
-    Alert.alert(
-      "Sync Account",
-      "To sync your account, please logout and register again with the same email. This will create your backend account.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Logout & Register",
-          onPress: async () => {
-            await signOut(auth);
-            await clearToken();
-            navigation.replace("Login");
-          }
-        }
-      ]
-    );
+    if (!user?.email) {
+      Alert.alert("Error", "Cannot sync: no email associated with account");
+      return;
+    }
+
+    // Show loading alert
+    Alert.alert("Syncing...", "Please wait while we sync your account.");
+
+    try {
+      console.log("Syncing account with backend...");
+      const res = await api.post("/api/auth/sync", {
+        email: user.email,
+        name: user.displayName || user.email.split('@')[0]
+      });
+
+      if (res.data?.data?.token) {
+        await saveToken(res.data.data.token);
+        setNeedsSync(false);
+        Alert.alert("Success", "Account synced successfully! AI features are now enabled.");
+
+        // Refresh data
+        fetchData();
+      } else {
+        Alert.alert("Error", "Invalid response from server");
+      }
+    } catch (err) {
+      console.error("Sync error:", err.message);
+      Alert.alert("Sync Failed", err.message || "Could not sync account. Please try again later.");
+    }
   };
 
   const fetchData = useCallback(async () => {
     try {
       const res = await api.get("/api/appliances");
-      setAppliances(res.data.appliances ?? res.data);
+      setAppliances(res.data.data || []);
     } catch (err) {
       console.log("Fetch error:", err.message);
     } finally {

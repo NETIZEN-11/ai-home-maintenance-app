@@ -26,7 +26,7 @@ const addAppliance = async (req, res) => {
 
     const appliance = await Appliance.create(applianceData);
 
-    sendSuccess(res, 201, 'Appliance added successfully', appliance);
+    sendSuccess(res, 201, appliance, 'Appliance added successfully');
   } catch (error) {
     console.error('Add appliance error:', error);
     sendError(res, 500, 'Failed to add appliance', error.message);
@@ -40,7 +40,7 @@ const getAppliances = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    sendSuccess(res, 200, 'Appliances retrieved successfully', appliances);
+    sendSuccess(res, 200, appliances, 'Appliances retrieved successfully');
   } catch (error) {
     console.error('Get appliances error:', error);
     sendError(res, 500, 'Failed to retrieve appliances', error.message);
@@ -61,7 +61,7 @@ const getAppliance = async (req, res) => {
       return sendError(res, 403, 'Access denied', 'You do not have permission to view this appliance');
     }
 
-    sendSuccess(res, 200, 'Appliance retrieved successfully', appliance);
+    sendSuccess(res, 200, appliance, 'Appliance retrieved successfully');
   } catch (error) {
     console.error('Get appliance error:', error);
     sendError(res, 500, 'Failed to retrieve appliance', error.message);
@@ -102,7 +102,7 @@ const updateAppliance = async (req, res) => {
 
     await appliance.save();
 
-    sendSuccess(res, 200, 'Appliance updated successfully', appliance);
+    sendSuccess(res, 200, appliance, 'Appliance updated successfully');
   } catch (error) {
     console.error('Update appliance error:', error);
     sendError(res, 500, 'Failed to update appliance', error.message);
@@ -125,7 +125,7 @@ const deleteAppliance = async (req, res) => {
 
     await appliance.deleteOne();
 
-    sendSuccess(res, 200, 'Appliance deleted successfully', { id: req.params.id });
+    sendSuccess(res, 200, { id: req.params.id }, 'Appliance deleted successfully');
   } catch (error) {
     console.error('Delete appliance error:', error);
     sendError(res, 500, 'Failed to delete appliance', error.message);

@@ -6,13 +6,12 @@ import { getStorage } from "firebase/storage";
 // Firebase configuration from environment variables
  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBxF_T2QHfek8sPBPpO4zIs07tAM_sbc8o",
-  authDomain: "ai-hma.firebaseapp.com",
-  projectId: "ai-hma",
-  storageBucket: "ai-hma.firebasestorage.app",
-  messagingSenderId: "792016276355",
-  appId: "1:792016276355:web:9575581d02be004c64c4b6",
-  measurementId: "G-LVVEMQHCGK"
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
 // Check if Firebase is properly configured

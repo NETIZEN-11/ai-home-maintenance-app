@@ -36,7 +36,7 @@ export default function ApplianceListScreen({ navigation }) {
   const fetchAppliances = useCallback(async () => {
     try {
       const res = await api.get("/api/appliances");
-      setAppliances(res.data.appliances ?? res.data);
+      setAppliances(res.data.data || []);
     } catch (err) {
       Alert.alert("Error", err.message || "Failed to load appliances");
     } finally {

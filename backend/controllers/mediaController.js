@@ -26,7 +26,7 @@ const uploadMedia = async (req, res) => {
       description
     });
 
-    sendSuccess(res, 201, 'Media uploaded successfully', mediaReport);
+    sendSuccess(res, 201, mediaReport, 'Media uploaded successfully');
   } catch (error) {
     console.error('Upload media error:', error);
     sendError(res, 500, 'Failed to upload media', error.message);

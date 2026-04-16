@@ -30,7 +30,12 @@ export default function LoginScreen({ navigation }) {
     try {
       setLoading(true);
 
-      // Step 1: Login to backend first to get JWT token
+      // Step 1: Firebase auth - this is the source of truth
+      console.log("Logging in to Firebase...");
+      const firebaseUser = await signInWithEmailAndPassword(auth, email, password);
+      console.log("Firebase login complete");
+
+      // Step 2: Try to get backend token (AI features require it)
       let backendToken = null;
       try {
         console.log("Logging in to backend...");
@@ -41,54 +46,10 @@ export default function LoginScreen({ navigation }) {
           console.log("Backend token saved");
         }
       } catch (backendErr) {
-        console.error("Backend login failed:", backendErr.message);
-        
-        // If user doesn't exist in backend, offer to create account
-        if (backendErr.message?.includes('Invalid email or password') || 
-            backendErr.message?.includes('Login failed')) {
-          console.log("User not found in backend, will prompt to sync account");
-        }
-      }
-
-      // Step 2: Firebase auth
-      console.log("Logging in to Firebase...");
-      const firebaseUser = await signInWithEmailAndPassword(auth, email, password);
-      console.log("Firebase login complete");
-
-      // Step 3: If no backend token, show sync option
-      if (!backendToken) {
-        Alert.alert(
-          "Account Sync Required",
-          "Your account needs to be synced with the backend for AI features. Please logout and register again with the same email.",
-          [
-            { 
-              text: "LATER", 
-              onPress: () => navigation.replace("Home"),
-              style: "cancel" 
-            },
-            { 
-              text: "LOGOUT & REGISTER", 
-              onPress: async () => {
-                try {
-                  await signOut(auth);
-                  await clearToken();
-                  navigation.replace("Register");
-                  setTimeout(() => {
-                    Alert.alert(
-                      "Register Again",
-                      "Please register with your email: " + email,
-                      [{ text: "OK" }]
-                    );
-                  }, 500);
-                } catch (err) {
-                  console.error("Logout error:", err);
-                  navigation.replace("Register");
-                }
-              }
-            }
-          ]
-        );
-        return; // Don't navigate yet
+        // Backend login failed - user exists in Firebase but not in backend
+        // Proceed anyway - HomeScreen will show sync banner if needed
+        console.log("Backend login failed:", backendErr.message);
+        console.log("User authenticated via Firebase, proceeding to Home");
       }
 
       navigation.replace("Home");

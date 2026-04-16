@@ -15,8 +15,8 @@ export const uploadFile = async (uri, fileName = "file.jpg") => {
     // Create FormData
     const formData = new FormData();
     
-    // Add file to FormData
-    formData.append('image', {
+    // Add file to FormData - backend expects field name 'media'
+    formData.append('media', {
       uri: uri,
       type: 'image/jpeg',
       name: fileName || 'photo.jpg'
@@ -24,18 +24,19 @@ export const uploadFile = async (uri, fileName = "file.jpg") => {
 
     console.log("Uploading to backend server...");
 
-    // Upload to backend
-    const response = await api.post('/api/media/upload', formData, {
+    // Upload to backend - endpoint is /api/media/
+    const response = await api.post('/api/media', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
 
-    if (response.data && response.data.url) {
+    // Backend returns { success: true, data: { fileUrl: ... } }
+    if (response.data && response.data.data && response.data.data.fileUrl) {
       console.log("Upload successful");
-      return response.data.url;
+      return response.data.data.fileUrl;
     } else {
-      throw new Error("No URL returned from server");
+      throw new Error("Invalid response format from server");
     }
   } catch (error) {
     console.error("Upload Error:", error.message);

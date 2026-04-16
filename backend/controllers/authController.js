@@ -88,7 +88,51 @@ const login = async (req, res) => {
   }
 };
 
+// Sync account - create backend account for Firebase user
+const syncAccount = async (req, res) => {
+  try {
+    const { email, name } = req.body;
+
+    if (!email) {
+      return sendError(res, 400, 'Sync failed', 'Email is required');
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+    if (user) {
+      // User exists, just generate a token
+      const token = generateToken(user._id);
+      return sendSuccess(res, 200, {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        token
+      }, 'Account synced successfully');
+    }
+
+    // Create new user without password - they can use forgot password to set one
+    user = await User.create({
+      name: name || email.split('@')[0],
+      email,
+      password: email + '_firebase_only_' + Date.now() // Placeholder password
+    });
+
+    const token = generateToken(user._id);
+
+    sendSuccess(res, 200, {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      token
+    }, 'Account created and synced successfully');
+  } catch (error) {
+    console.error('Sync error:', error);
+    sendError(res, 500, 'Sync failed', error.message);
+  }
+};
+
 module.exports = {
   register,
-  login
+  login,
+  syncAccount
 };

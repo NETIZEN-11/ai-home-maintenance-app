@@ -83,10 +83,16 @@ Be concise. Provide issue summary, severity, and practical solution.`
     
     let result
     try {
-      result = JSON.parse(cleaned)
+      // Improved cleaning to handle edge cases in Gemini response
+      const jsonStart = cleaned.indexOf('{');
+      const jsonEnd = cleaned.lastIndexOf('}');
+      if (jsonStart === -1 || jsonEnd === -1) throw new Error("No JSON found");
+      
+      const jsonContent = cleaned.substring(jsonStart, jsonEnd + 1);
+      result = JSON.parse(jsonContent);
     } catch (parseErr) {
-      console.error("Failed to parse Gemini response:", cleaned)
-      throw new Error("Invalid JSON response from Gemini API")
+      console.error("Failed to parse Gemini response:", raw);
+      throw new Error("Invalid format from AI service");
     }
 
     // Validate response structure
@@ -131,9 +137,9 @@ Be concise. Provide issue summary, severity, and practical solution.`
   }
 
   return {
-    issue: "Appliance issue detected",
+    issue: "Appliance maintenance required",
     severity: "Medium",
-    solution: "Check the appliance manual and ensure proper maintenance. Contact a technician if the issue persists.",
+    solution: "Perform a standard check-up. Inspect connections, clean filters, and ensure proper ventilation. Consult the manual for specific maintenance steps."
   }
 }
 

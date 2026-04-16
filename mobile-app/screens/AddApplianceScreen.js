@@ -27,14 +27,55 @@ export default function AddApplianceScreen({ navigation, route }) {
   const [focusedField, setFocusedField] = useState(null);
 
   const pickImage = async () => {
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) return Alert.alert("Permission required");
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 0.7 });
-    if (!result.canceled) setImage(result.assets[0].uri);
+    // Show option to take photo or choose from gallery
+    Alert.alert(
+      "Add Photo",
+      "Choose an option",
+      [
+        {
+          text: "Take Photo",
+          onPress: async () => {
+            const cameraPerm = await ImagePicker.requestCameraPermissionsAsync();
+            if (!cameraPerm.granted) {
+              Alert.alert("Permission Required", "Camera permission is needed to take photos");
+              return;
+            }
+            const result = await ImagePicker.launchCameraAsync({
+              mediaTypes: ["images"],
+              quality: 0.7,
+              allowsEditing: true,
+              aspect: [4, 3]
+            });
+            if (!result.canceled) {
+              setImage(result.assets[0].uri);
+            }
+          }
+        },
+        {
+          text: "Choose from Gallery",
+          onPress: async () => {
+            const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (!perm.granted) {
+              Alert.alert("Permission Required", "Gallery permission is needed to select photos");
+              return;
+            }
+            const result = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ["images"],
+              quality: 0.7,
+              allowsEditing: true,
+              aspect: [4, 3]
+            });
+            if (!result.canceled) {
+              setImage(result.assets[0].uri);
+            }
+          }
+        },
+        { text: "Cancel", style: "cancel" }
+      ]
+    );
   };
 
   const handleSubmit = async () => {
-    // Use custom type if "Another" is selected
     const finalType = type === "Another" ? customType : type;
     
     if (!name.trim() || !finalType || !serviceDate)
@@ -46,7 +87,6 @@ export default function AddApplianceScreen({ navigation, route }) {
     if (type === "Another" && !customType.trim())
       return Alert.alert("Custom Type Required", "Please enter a custom appliance type");
 
-    // Validate date format
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (!dateRegex.test(serviceDate))
       return Alert.alert("Invalid Date", "Service date must be in YYYY-MM-DD format");
@@ -82,25 +122,6 @@ export default function AddApplianceScreen({ navigation, route }) {
     }
   };
 
-  const InputField = ({ label, placeholder, value, onChangeText, fieldKey, keyboard, multiline }) => (
-    <View style={styles.fieldGroup}>
-      <Text style={styles.fieldLabel}>{label}</Text>
-      <View style={[styles.inputBox, focusedField === fieldKey && styles.inputFocused, multiline && { height: 80 }]}>
-        <TextInput
-          style={[styles.input, multiline && { textAlignVertical: "top" }]}
-          placeholder={placeholder}
-          placeholderTextColor={Colors.gray400}
-          value={value}
-          onChangeText={onChangeText}
-          keyboardType={keyboard || "default"}
-          multiline={multiline}
-          onFocus={() => setFocusedField(fieldKey)}
-          onBlur={() => setFocusedField(null)}
-        />
-      </View>
-    </View>
-  );
-
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
       <View style={styles.header}>
@@ -108,7 +129,6 @@ export default function AddApplianceScreen({ navigation, route }) {
         <Text style={styles.subtitle}>Fill in the details below</Text>
       </View>
 
-      {/* Image Upload */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Appliance Photo</Text>
         <TouchableOpacity style={styles.imageBox} onPress={pickImage} activeOpacity={0.8}>
@@ -117,21 +137,19 @@ export default function AddApplianceScreen({ navigation, route }) {
           ) : (
             <View style={styles.imagePlaceholder}>
               <Ionicons name="camera-outline" size={32} color={Colors.gray400} />
-              <Text style={styles.imagePlaceholderText}>Tap to add photo</Text>
+              <Text style={styles.imagePlaceholderText}>Tap to take or choose photo</Text>
             </View>
           )}
         </TouchableOpacity>
       </View>
 
-      {/* Basic Info */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Basic Information</Text>
-        <InputField label="Appliance Name *" placeholder="e.g. Samsung AC" value={name} onChangeText={setName} fieldKey="name" />
-        <InputField label="Brand" placeholder="e.g. Samsung, LG" value={brand} onChangeText={setBrand} fieldKey="brand" />
-        <InputField label="Model Number" placeholder="e.g. AR18TYHYEWKN" value={modelNumber} onChangeText={setModelNumber} fieldKey="model" />
-        <InputField label="Location" placeholder="e.g. Bedroom, Kitchen" value={location} onChangeText={setLocation} fieldKey="location" />
+        <InputField label="Appliance Name *" placeholder="e.g. Samsung AC" value={name} onChangeText={setName} fieldKey="name" focusedField={focusedField} setFocusedField={setFocusedField} />
+        <InputField label="Brand" placeholder="e.g. Samsung, LG" value={brand} onChangeText={setBrand} fieldKey="brand" focusedField={focusedField} setFocusedField={setFocusedField} />
+        <InputField label="Model Number" placeholder="e.g. AR18TYHYEWKN" value={modelNumber} onChangeText={setModelNumber} fieldKey="model" focusedField={focusedField} setFocusedField={setFocusedField} />
+        <InputField label="Location" placeholder="e.g. Bedroom, Kitchen" value={location} onChangeText={setLocation} fieldKey="location" focusedField={focusedField} setFocusedField={setFocusedField} />
 
-        {/* Type Selector */}
         <Text style={styles.fieldLabel}>Type *</Text>
         <View style={styles.typeGrid}>
           {TYPES.map(t => (
@@ -148,7 +166,6 @@ export default function AddApplianceScreen({ navigation, route }) {
           ))}
         </View>
 
-        {/* Custom Type Input - Shows when "Another" is selected */}
         {showCustomType && (
           <View style={styles.customTypeContainer}>
             <Text style={styles.customTypeLabel}>Enter Custom Appliance Type</Text>
@@ -169,17 +186,15 @@ export default function AddApplianceScreen({ navigation, route }) {
         )}
       </View>
 
-      {/* Dates */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Dates</Text>
-        <InputField label="Purchase Date" placeholder="YYYY-MM-DD" value={purchaseDate} onChangeText={setPurchaseDate} fieldKey="purchase" />
-        <InputField label="Next Service Date *" placeholder="YYYY-MM-DD" value={serviceDate} onChangeText={setServiceDate} fieldKey="service" />
+        <InputField label="Purchase Date" placeholder="YYYY-MM-DD" value={purchaseDate} onChangeText={setPurchaseDate} fieldKey="purchase" focusedField={focusedField} setFocusedField={setFocusedField} />
+        <InputField label="Next Service Date *" placeholder="YYYY-MM-DD" value={serviceDate} onChangeText={setServiceDate} fieldKey="service" focusedField={focusedField} setFocusedField={setFocusedField} />
       </View>
 
-      {/* Notes */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Additional Notes</Text>
-        <InputField label="Notes" placeholder="Any additional information..." value={notes} onChangeText={setNotes} fieldKey="notes" multiline />
+        <InputField label="Notes" placeholder="Any additional information..." value={notes} onChangeText={setNotes} fieldKey="notes" multiline focusedField={focusedField} setFocusedField={setFocusedField} />
       </View>
 
       <TouchableOpacity
@@ -196,6 +211,25 @@ export default function AddApplianceScreen({ navigation, route }) {
     </ScrollView>
   );
 }
+
+const InputField = ({ label, placeholder, value, onChangeText, fieldKey, keyboard, multiline, focusedField, setFocusedField }) => (
+  <View style={styles.fieldGroup}>
+    <Text style={styles.fieldLabel}>{label}</Text>
+    <View style={[styles.inputBox, focusedField === fieldKey && styles.inputFocused, multiline && { height: 80 }]}>
+      <TextInput
+        style={[styles.input, multiline && { textAlignVertical: "top" }]}
+        placeholder={placeholder}
+        placeholderTextColor={Colors.gray400}
+        value={value}
+        onChangeText={onChangeText}
+        keyboardType={keyboard || "default"}
+        multiline={multiline}
+        onFocus={() => setFocusedField(fieldKey)}
+        onBlur={() => setFocusedField(null)}
+      />
+    </View>
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },

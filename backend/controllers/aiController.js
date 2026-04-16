@@ -25,7 +25,7 @@ const analyze = async (req, res) => {
       solution: result.solution
     });
 
-    sendSuccess(res, 200, 'Analysis completed successfully', aiResponse);
+    sendSuccess(res, 200, aiResponse, 'Analysis completed successfully');
   } catch (error) {
     console.error('AI analysis error:', error);
     sendError(res, 500, 'Analysis failed', error.message);
@@ -41,7 +41,7 @@ const getHistory = async (req, res) => {
       .limit(50)
       .lean();
 
-    sendSuccess(res, 200, 'History retrieved successfully', history);
+    sendSuccess(res, 200, history, 'History retrieved successfully');
   } catch (error) {
     console.error('Get history error:', error);
     sendError(res, 500, 'Failed to retrieve history', error.message);
