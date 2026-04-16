@@ -71,13 +71,42 @@ An intelligent mobile application that leverages AI to help homeowners maintain 
      - `JWT_SECRET` - At least 32 characters
      - `GEMINI_API_KEY` - (Optional) For AI features
      - `NODE_ENV` = `production`
+   - Build Command: `npm install`
+   - Start Command: `npm start`
    - Click "Deploy"
 
-3. **Environment Variables on Render**:
+### Deploy Mobile App to Vercel (Web Version)
+
+1. **Install Vercel CLI**:
+```bash
+npm install -g vercel
+```
+
+2. **Deploy from mobile-app directory**:
+```bash
+cd mobile-app
+vercel
+```
+
+3. **Or deploy via Vercel Dashboard**:
+   - Go to [vercel.com](https://vercel.com)
+   - Import your GitHub repository
+   - Set root directory to `mobile-app`
+   - Build Command: `npx expo export --platform web`
+   - Output Directory: `dist`
+   - Add environment variables from `.env.production`
+
+4. **Required Environment Variables on Vercel**:
    ```
-   MONGO_URI=mongodb+srv://username:password@cluster.xxxxx.mongodb.net/ai-hma
-   JWT_SECRET=your-super-secret-key-at-least-32-characters-long
-   NODE_ENV=production
+   EXPO_PUBLIC_API_URL = https://your-backend-url.onrender.com
+   EXPO_PUBLIC_FIREBASE_API_KEY = your-firebase-api-key
+   EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN = your-project.firebaseapp.com
+   EXPO_PUBLIC_FIREBASE_PROJECT_ID = your-project-id
+   EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET = your-project.firebasestorage.app
+   EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = your-sender-id
+   EXPO_PUBLIC_FIREBASE_APP_ID = your-app-id
+   EXPO_PUBLIC_SUPABASE_URL = https://your-project.supabase.co
+   EXPO_PUBLIC_SUPABASE_ANON_KEY = your-supabase-anon-key
    ```
 
 ### Important Notes
@@ -85,6 +114,7 @@ An intelligent mobile application that leverages AI to help homeowners maintain 
 - **Uploads are ephemeral**: On Render's free tier, files uploaded to the server are deleted on each deploy. For production, consider using Cloudinary or AWS S3 for file storage.
 - **Health Check**: Backend has `/health` endpoint at root path.
 - **CORS**: Render domain is already configured in CORS settings.
+- **Update API URL**: After backend deploys, update `EXPO_PUBLIC_API_URL` in mobile app Vercel env vars with your Render backend URL.
 
 ## 📁 Project Structure
 
