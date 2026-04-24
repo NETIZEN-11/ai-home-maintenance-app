@@ -57,3 +57,7 @@ viva-explanation/
 
 # Code Explanation Documentation (Local Reference Only - Do Not Push)
 explanation/
+
+# Interview Preparation Folders (Local Only - Do Not Push)
+backend-viva/
+frontend-viva/
