@@ -98,16 +98,16 @@ export default function RegisterScreen({ navigation }) {
 
         <View style={styles.card}>
           <Text style={styles.label}>Full Name</Text>
-          <Field icon="person-outline" placeholder="John Doe" value={name} onChangeText={setName} fieldKey="name" focusedField={focusedField} setFocusedField={setFocusedField} />
+          <Field icon="person-outline" placeholder=" " value={name} onChangeText={setName} fieldKey="name" focusedField={focusedField} setFocusedField={setFocusedField} />
 
           <Text style={[styles.label, { marginTop: Spacing.md }]}>Email</Text>
-          <Field icon="mail-outline" placeholder="you@example.com" value={email} onChangeText={setEmail} fieldKey="email" keyboard="email-address" focusedField={focusedField} setFocusedField={setFocusedField} />
+          <Field icon="mail-outline" placeholder=" " value={email} onChangeText={setEmail} fieldKey="email" keyboard="email-address" focusedField={focusedField} setFocusedField={setFocusedField} />
 
           <Text style={[styles.label, { marginTop: Spacing.md }]}>Password</Text>
-          <Field icon="lock-closed-outline" placeholder="Min. 6 characters" value={password} onChangeText={setPassword} secure fieldKey="password" focusedField={focusedField} setFocusedField={setFocusedField} showPassword={showPassword} setShowPassword={setShowPassword} />
+          <Field icon="lock-closed-outline" placeholder=" " value={password} onChangeText={setPassword} secure fieldKey="password" focusedField={focusedField} setFocusedField={setFocusedField} showPassword={showPassword} setShowPassword={setShowPassword} />
 
           <Text style={[styles.label, { marginTop: Spacing.md }]}>Confirm Password</Text>
-          <Field icon="shield-checkmark-outline" placeholder="Repeat password" value={confirmPassword} onChangeText={setConfirmPassword} secure fieldKey="confirm" focusedField={focusedField} setFocusedField={setFocusedField} showPassword={showPassword} setShowPassword={setShowPassword} />
+          <Field icon="shield-checkmark-outline" placeholder=" " value={confirmPassword} onChangeText={setConfirmPassword} secure fieldKey="confirm" focusedField={focusedField} setFocusedField={setFocusedField} showPassword={showPassword} setShowPassword={setShowPassword} />
 
           <TouchableOpacity
             style={[styles.btn, loading && { opacity: 0.7 }]}

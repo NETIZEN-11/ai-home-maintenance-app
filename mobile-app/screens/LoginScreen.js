@@ -94,7 +94,7 @@ export default function LoginScreen({ navigation }) {
             <MaterialCommunityIcons name="home-lightning-bolt" size={40} color={Colors.white} />
           </View>
           <Text style={styles.appName}>AI Home Assistant</Text>
-          <Text style={styles.tagline}>Smart maintenance, simplified</Text>
+          <Text style={styles.tagline}>Smart maintenance </Text>
         </View>
 
         {/* Card */}
@@ -110,7 +110,7 @@ export default function LoginScreen({ navigation }) {
             <Ionicons name="mail-outline" size={18} color={focusedField === "email" ? Colors.primary : Colors.gray500} />
             <TextInput
               style={styles.input}
-              placeholder="you@example.com"
+              placeholder=" "
               placeholderTextColor={Colors.gray400}
               value={email}
               onChangeText={setEmail}
@@ -132,7 +132,7 @@ export default function LoginScreen({ navigation }) {
             <Ionicons name="lock-closed-outline" size={18} color={focusedField === "password" ? Colors.primary : Colors.gray500} />
             <TextInput
               style={styles.input}
-              placeholder="Enter your password"
+              placeholder=" "
               placeholderTextColor={Colors.gray400}
               secureTextEntry={!showPassword}
               value={password}
@@ -183,7 +183,6 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         <Text style={styles.footer}>
-          By signing in, you agree to our Terms & Privacy Policy
         </Text>
       </ScrollView>
     </KeyboardAvoidingView>
