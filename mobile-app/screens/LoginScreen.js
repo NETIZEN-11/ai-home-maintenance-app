@@ -139,9 +139,18 @@ export default function LoginScreen({ navigation }) {
               onChangeText={setPassword}
               onFocus={() => setFocusedField("password")}
               onBlur={() => setFocusedField(null)}
+              autoCapitalize="none"
             />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={18} color={Colors.gray500} />
+            <TouchableOpacity 
+              onPress={() => setShowPassword(prev => !prev)}
+              activeOpacity={0.7}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons 
+                name={showPassword ? "eye-off-outline" : "eye-outline"} 
+                size={20} 
+                color={Colors.gray600} 
+              />
             </TouchableOpacity>
           </View>
 

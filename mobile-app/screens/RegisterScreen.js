@@ -9,6 +9,7 @@ import { auth } from "../services/firebase";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { Colors, Spacing, Radius, Shadow, FontSize } from "../constants/theme";
+import { testBackendConnection } from "../utils/testBackend";
 
 export default function RegisterScreen({ navigation }) {
   const { saveToken } = useAuth();
@@ -17,6 +18,7 @@ export default function RegisterScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
 
@@ -34,6 +36,17 @@ export default function RegisterScreen({ navigation }) {
 
     try {
       setLoading(true);
+
+      // Test backend connection first
+      console.log("🔍 Testing backend connection...");
+      const isConnected = await testBackendConnection();
+      if (!isConnected) {
+        Alert.alert(
+          "Backend Unreachable", 
+          "Cannot connect to server. Please check:\n\n1. Backend is running\n2. Correct API URL in .env\n3. Internet connection\n\nCheck console for details."
+        );
+        return;
+      }
 
       // Step 1: Register with backend first to get JWT token
       let backendToken = null;
@@ -107,7 +120,7 @@ export default function RegisterScreen({ navigation }) {
           <Field icon="lock-closed-outline" placeholder=" " value={password} onChangeText={setPassword} secure fieldKey="password" focusedField={focusedField} setFocusedField={setFocusedField} showPassword={showPassword} setShowPassword={setShowPassword} />
 
           <Text style={[styles.label, { marginTop: Spacing.md }]}>Confirm Password</Text>
-          <Field icon="shield-checkmark-outline" placeholder=" " value={confirmPassword} onChangeText={setConfirmPassword} secure fieldKey="confirm" focusedField={focusedField} setFocusedField={setFocusedField} showPassword={showPassword} setShowPassword={setShowPassword} />
+          <Field icon="shield-checkmark-outline" placeholder=" " value={confirmPassword} onChangeText={setConfirmPassword} secure fieldKey="confirm" focusedField={focusedField} setFocusedField={setFocusedField} showPassword={showConfirmPassword} setShowPassword={setShowConfirmPassword} />
 
           <TouchableOpacity
             style={[styles.btn, loading && { opacity: 0.7 }]}
@@ -133,28 +146,42 @@ export default function RegisterScreen({ navigation }) {
   );
 }
 
-const Field = ({ icon, placeholder, value, onChangeText, secure, fieldKey, keyboard, focusedField, setFocusedField, showPassword, setShowPassword }) => (
-  <View style={[styles.inputBox, focusedField === fieldKey && styles.inputFocused]}>
-    <Ionicons name={icon} size={18} color={focusedField === fieldKey ? Colors.primary : Colors.gray500} />
-    <TextInput
-      style={styles.input}
-      placeholder={placeholder}
-      placeholderTextColor={Colors.gray400}
-      value={value}
-      onChangeText={onChangeText}
-      secureTextEntry={secure && !showPassword}
-      keyboardType={keyboard || "default"}
-      autoCapitalize={keyboard === "email-address" ? "none" : "words"}
-      onFocus={() => setFocusedField(fieldKey)}
-      onBlur={() => setFocusedField(null)}
-    />
-    {secure && (
-      <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-        <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={18} color={Colors.gray500} />
-      </TouchableOpacity>
-    )}
-  </View>
-);
+const Field = ({ icon, placeholder, value, onChangeText, secure, fieldKey, keyboard, focusedField, setFocusedField, showPassword, setShowPassword }) => {
+  const shouldHidePassword = secure && !showPassword;
+  
+  return (
+    <View style={[styles.inputBox, focusedField === fieldKey && styles.inputFocused]}>
+      <Ionicons name={icon} size={18} color={focusedField === fieldKey ? Colors.primary : Colors.gray500} />
+      <TextInput
+        style={styles.input}
+        placeholder={placeholder}
+        placeholderTextColor={Colors.gray400}
+        value={value}
+        onChangeText={onChangeText}
+        secureTextEntry={shouldHidePassword}
+        keyboardType={keyboard || "default"}
+        autoCapitalize={secure ? "none" : (keyboard === "email-address" ? "none" : "words")}
+        onFocus={() => setFocusedField(fieldKey)}
+        onBlur={() => setFocusedField(null)}
+      />
+      {secure && (
+        <TouchableOpacity 
+          onPress={() => {
+            setShowPassword(prev => !prev);
+          }}
+          activeOpacity={0.7}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons 
+            name={showPassword ? "eye-off-outline" : "eye-outline"} 
+            size={20} 
+            color={Colors.gray600} 
+          />
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
