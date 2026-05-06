@@ -45,8 +45,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "68d14d3d-c902-4cce-b65a-7de76e2d2da7"
+        "projectId": "7565e8bd-ad3f-42d7-a899-7b0410756678"
       }
-    }
+    },
+    "owner": "unicorns"
   }
 }
