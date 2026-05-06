@@ -45,7 +45,7 @@ export default function UploadScreen({ navigation, route }) {
       // Try to upload image if media exists
       if (media) {
         try {
-          console.log("Uploading image to Supabase...");
+          console.log("Uploading image to cloud storage (Supabase → Firebase → Backend)...");
           imageUrl = await uploadFile(media, "issue.jpg");
           console.log("Image uploaded successfully:", imageUrl);
         } catch (uploadError) {
