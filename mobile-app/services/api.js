@@ -32,7 +32,7 @@ const BASE_URL = getBaseURL();
 
 const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000, // 10 seconds for faster failure detection
+  timeout: 30000, // 30 seconds for production URLs (Render can be slow on free tier)
   headers: {
     'Content-Type': 'application/json',
   }
